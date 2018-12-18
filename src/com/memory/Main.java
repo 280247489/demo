@@ -1,6 +1,6 @@
 package com.memory;
 
-import com.memory.container.MainJFrame;
+import com.memory.container.LoginFrame;
 import com.memory.db.Utils;
 
 /**
@@ -11,7 +11,7 @@ import com.memory.db.Utils;
 public class Main {
     public static void main(String[] args) {
         Utils.read2System();
-        MainJFrame.init();
+        LoginFrame.init();
         //Utils.write2LocalDB();
     }
 }
