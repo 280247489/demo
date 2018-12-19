@@ -10,8 +10,17 @@ import com.memory.db.Utils;
  */
 public class Main {
     public static void main(String[] args) {
-        Utils.read2System();
-        LoginFrame.init();
-        //Utils.write2LocalDB();
+        try {
+            Utils.read2System();
+            if (Utils.lock != null && Utils.lock.isValid()) {
+                System.out.println("222");
+                LoginFrame.init();
+            }else{
+                System.out.println("1111");
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
