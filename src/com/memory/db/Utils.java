@@ -14,9 +14,13 @@ import java.util.UUID;
  * @Description:
  */
 public class Utils {
-    public static final String loginname = "root";
-    public static final String password = "rootroot";
+    public static final String loginname = "houai@yjw";
+    public static final String password = "147258";
 
+    //src/com/memory/db/
+    private static final String dbpath = "local.db";
+    private static final String file_dir = "proxy";
+    private static final String fileLockPath = "file.lock";
     public static FileLock lock = null;
 
     private static Proxy proxy = null;
@@ -69,25 +73,47 @@ public class Utils {
         return flag;
     }
 
+    public static boolean checkProcess() {
+        File dir = new File(file_dir);
+        boolean flag = false;
+        try {
+            if(!dir.exists()){
+                dir.mkdir();
+            }
+            RandomAccessFile raf = new RandomAccessFile(file_dir+File.separator+fileLockPath, "rw");
+            FileChannel fc = raf.getChannel();
+            lock  = fc.tryLock();
+            if (lock != null && lock.isValid()) {
+                flag = true;
+            }
+        } catch (IOException e) {
+            flag = false;
+        }
+        return flag;
+    }
     /***************************************************************************/
 
-    private static final String dbpath = "src/com/memory/db/local.db";
-
-    public static void read2System() throws Exception{
-        File file = new File(dbpath);
-        RandomAccessFile raf = new RandomAccessFile(file, "rw");
-
-        FileChannel fc = raf.getChannel();
-
+    public static void read2System() {
+        File dir = new File(file_dir);
+        File file = new File(file_dir+File.separator+dbpath);
+        System.out.println(file.getAbsoluteFile());
         try{
+            if(!dir.exists()){
+                dir.mkdir();
+            }
+            if(!file.exists()){
+                file.createNewFile();
+            }
             FileReader reader = new FileReader(file);
             BufferedReader br = new BufferedReader(reader);
+
             String line;
             StringBuffer stringBuffer = new StringBuffer("");
             while ((line = br.readLine()) != null) {
                 stringBuffer.append(line);
             }
             if(!"".equals(stringBuffer.toString())){
+                //String jie = Base64Utils.getInstance().decode(stringBuffer.toString());
                 jsonArray = JSONArray.parseArray(stringBuffer.toString());
             }else{
                 jsonArray = new JSONArray();
@@ -95,16 +121,15 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        lock  = fc.tryLock();
     }
 
     public static void write2LocalDB(){
-        File file = new File(dbpath);
+        File file = new File(file_dir+File.separator+dbpath);
         String content = jsonArray.toJSONString();
         try{
             FileWriter fileWriter=new FileWriter(file.getAbsoluteFile());
             BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
-            bufferedWriter.write(content);
+            bufferedWriter.write(content.toCharArray());
             bufferedWriter.close();
         }catch(Exception e){
             e.printStackTrace();

@@ -10,17 +10,11 @@ import com.memory.db.Utils;
  */
 public class Main {
     public static void main(String[] args) {
-        try {
+        if(Utils.checkProcess()){
             Utils.read2System();
-            if (Utils.lock != null && Utils.lock.isValid()) {
-                System.out.println("222");
-                LoginFrame.init();
-            }else{
-                System.out.println("1111");
-                System.exit(0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            LoginFrame.init();
+        }else{
+            System.exit(0);
         }
     }
 }

@@ -7,11 +7,14 @@ import com.memory.db.Utils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 
 /**
@@ -20,11 +23,14 @@ import java.util.Enumeration;
  * @Description:
  */
 public class IndexFrame {
-    public static JFrame jFrame = null;
+    public static DefaultMutableTreeNode root = null;
+    public static DefaultMutableTreeNode gongsi = null;
+    public static DefaultTreeModel dt = null;
+    public static JTree tree = null;
     public static void init(){
+        JFrame jFrame = new JFrame();
         Font font =new Font("微软雅黑", Font.PLAIN, 16);//设置字体
         Font font1 =new Font("微软雅黑", Font.PLAIN, 12);//设置字体
-        jFrame = new JFrame();
 
         Panel panel = new Panel(new GridLayout(1, 5));
         JLabel label_name=new JLabel("姓名: ");
@@ -58,22 +64,16 @@ public class IndexFrame {
 
         panel.add(panel1);
 
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode();
-        Proxy top_proxy = new Proxy();
-        top_proxy.setId("");
-        top_proxy.setName("公司管理");
-        top_proxy.setMoney(0.0);
-        top_proxy.setMoneySum(0.0);
-        top_proxy.setCount(0);
-        top_proxy.setParent("");
-        top_proxy.setParentName("");
-
-        top.setUserObject(top_proxy);
-
-        initTree(top, "", Utils.getJsonArray());
-        JTree tree = new JTree(top);
+        //核心
+        gongsi = initTree(null, "", Utils.getJsonArray());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        root = new DefaultMutableTreeNode(simpleDateFormat.format(new Date()));
+        root.add(gongsi);
+        dt = new DefaultTreeModel(root);
+        tree = new JTree(dt);
         tree.setFont(font);
-        expandAll(tree, new TreePath(top), true);
+
+        expandAll(tree, new TreePath(root), true);
 
         int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
         int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
@@ -93,13 +93,16 @@ public class IndexFrame {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
                     .getLastSelectedPathComponent();
             if(node != null){
-                Proxy proxy = (Proxy)node.getUserObject();
-                label_name.setText("姓名："+proxy.getName());
-                label_money.setText("回款："+proxy.getMoney());
-                label_money_sum.setText("总回款："+proxy.getMoneySum());
-                label_name_parent.setText("上级："+proxy.getParentName());
+                try {
+                    Proxy proxy = (Proxy)node.getUserObject();
+                    label_name.setText("姓名："+proxy.getName());
+                    label_money.setText("回款："+proxy.getMoney());
+                    label_money_sum.setText("总回款："+proxy.getMoneySum());
+                    label_name_parent.setText("上级："+proxy.getParentName());
 
-                Utils.setProxy(proxy);
+                    Utils.setProxy(proxy);
+                } catch (Exception e1) {
+                }
             }
         });
         btn_add.addActionListener(e -> {
@@ -151,7 +154,6 @@ public class IndexFrame {
 
             @Override
             public void windowClosed(WindowEvent e) {
-                jFrame = null;
                 Utils.write2LocalDB();
             }
 
@@ -184,7 +186,20 @@ public class IndexFrame {
      * @param array
      * @return
      */
-    private static void initTree(DefaultMutableTreeNode parentNode, String parent, JSONArray array){
+    private static DefaultMutableTreeNode initTree(DefaultMutableTreeNode parentNode, String parent, JSONArray array){
+        if(parentNode == null){
+            parentNode = new DefaultMutableTreeNode();
+            Proxy top_proxy = new Proxy();
+            top_proxy.setId("");
+            top_proxy.setName("公司管理");
+            top_proxy.setMoney(0.0);
+            top_proxy.setMoneySum(0.0);
+            top_proxy.setCount(0);
+            top_proxy.setParent("");
+            top_proxy.setParentName("");
+
+            parentNode.setUserObject(top_proxy);
+        }
         int parent_count = 0;
         double parent_moneySum = 0;
         for (int i = 0; i < array.size(); i++) {
@@ -219,6 +234,7 @@ public class IndexFrame {
         Proxy proxy = (Proxy) parentNode.getUserObject();
         proxy.setCount(proxy.getCount()+parent_count);
         proxy.setMoneySum(proxy.getMoneySum()+parent_moneySum);
+        return parentNode;
     }
 
     /**
@@ -247,9 +263,11 @@ public class IndexFrame {
         }
     }
     public static void reload(){
-        jFrame.setVisible(false);// 本窗口隐藏,
-        jFrame.dispose();//本窗口销毁,释放内存资源
-        jFrame = null;
-        init();
+        //核心
+        root.removeAllChildren();
+        gongsi = initTree(null, "", Utils.getJsonArray());
+        root.add(gongsi);
+        dt.reload();
+        expandAll(tree, new TreePath(root), true);
     }
 }

@@ -78,7 +78,7 @@ public class ModelFrame {
                 txt_name.setText(proxy.getName());
                 txt_money.setText(proxy.getMoney()+"");
             }
-
+            txt_name.setFocusable(true);
             jFrame.setContentPane(panel);
             jFrame.setVisible(true);
 
