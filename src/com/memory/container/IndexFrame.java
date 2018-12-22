@@ -11,6 +11,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
@@ -37,19 +39,27 @@ public class IndexFrame {
         label_name.setFont(font);
         panel.add(label_name);
 
-        JLabel label_money=new JLabel("回款: ");
+        JLabel label_money=new JLabel("个人回款: ");
         label_money.setFont(font);
         panel.add(label_money);
 
-        JLabel label_money_sum=new JLabel("总回款: ");
+        JLabel label_money_sum=new JLabel("团队回款: ");
         label_money_sum.setFont(font);
         panel.add(label_money_sum);
 
-        JLabel label_name_parent=new JLabel("上级: ");
-        label_name_parent.setFont(font);
-        panel.add(label_name_parent);
+        Panel panel1 = new Panel(new GridLayout(1, 5, 3,0));
 
-        Panel panel1 = new Panel(new GridLayout(1, 3, 3,0));
+        JComboBox comboBox=new JComboBox();
+        for (int i = Utils.getBeginMonth(); i <= Utils.getEndMonth(); i++) {
+            comboBox.addItem(i);
+        }
+        comboBox.setSelectedItem(Utils.getCurrentMonth());
+        panel1.add(comboBox);
+
+        JButton btn_hk=new JButton("款");
+        btn_hk.setFont(font1);
+        panel1.add(btn_hk);
+
         JButton btn_add=new JButton("增");
         btn_add.setFont(font1);
         panel1.add(btn_add);
@@ -66,8 +76,8 @@ public class IndexFrame {
 
         //核心
         gongsi = initTree(null, "", Utils.getJsonArray());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        root = new DefaultMutableTreeNode(simpleDateFormat.format(new Date()));
+
+        root = new DefaultMutableTreeNode();
         root.add(gongsi);
         dt = new DefaultTreeModel(root);
         tree = new JTree(dt);
@@ -85,7 +95,7 @@ public class IndexFrame {
         jFrame.add(panel, BorderLayout.NORTH);
         jFrame.add(jScrollPane, BorderLayout.CENTER);
 
-        jFrame.setSize(800, 600);
+        jFrame.setSize(1000, 800);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
 
@@ -98,19 +108,31 @@ public class IndexFrame {
                     label_name.setText("姓名："+proxy.getName());
                     label_money.setText("回款："+proxy.getMoney());
                     label_money_sum.setText("总回款："+proxy.getMoneySum());
-                    label_name_parent.setText("上级："+proxy.getParentName());
 
                     Utils.setProxy(proxy);
                 } catch (Exception e1) {
                 }
             }
         });
+        comboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED){
+                     Utils.setCurrentMonth((int)comboBox.getSelectedItem());
+                    reload();
+                }
+            }
+        });
+        btn_hk.addActionListener(e -> {
+            if(Utils.getProxy()!=null){
+                //弹层，添加
+                HkFrame.init();
+            }
+        });
         btn_add.addActionListener(e -> {
             if(Utils.getProxy()!=null){
                 //弹层，添加
                  ModelFrame.init("add", Utils.getProxy());
-            }else{
-
             }
         });
         btn_upd.addActionListener(e -> {
@@ -212,13 +234,21 @@ public class IndexFrame {
                 Proxy proxy = new Proxy();
                 proxy.setId(obj.getString("id"));
                 proxy.setName(obj.getString("name"));
-                proxy.setMoney(obj.getDouble("money"));
+                double money = 0.0;
+                if(obj.containsKey("monthMoney")){
+                    JSONObject monthMoneyObj = obj.getJSONObject("monthMoney");
+                    if(monthMoneyObj.containsKey(""+Utils.getCurrentMonth())){
+                        money = monthMoneyObj.getDouble(""+Utils.getCurrentMonth());
+                    }
+                }
+                proxy.setMoney(money);
                 proxy.setMoneySum(proxy.getMoney());
                 proxy.setCount(0);
                 proxy.setParent(obj.getString("parent"));
                 proxy.setParentName(parentNode.getUserObject().toString());
 
                 node.setUserObject(proxy);
+
                 parentNode.add(node);
 
                 if(Utils.hasNode(obj.getString("id"))){

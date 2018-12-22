@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -14,15 +16,23 @@ import java.util.UUID;
  * @Description:
  */
 public class Utils {
-    public static final String loginname = "houai@yjw";
-    public static final String password = "147258";
+    public static final String loginname = "";
+    public static final String password = "";
+
+    public static SimpleDateFormat sf_yyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat sf_MM = new SimpleDateFormat("MM");
+    //public static final String loginname = "houai@yjw";
+    //public static final String password = "147258";
 
     //src/com/memory/db/
-    private static final String dbpath = "local.db";
     private static final String file_dir = "proxy";
+    private static final String dbpath = "local.db";
     private static final String fileLockPath = "file.lock";
     public static FileLock lock = null;
 
+    private static int beginMonth = 1;
+    private static int endMonth = Integer.parseInt(sf_MM.format(new Date()));
+    private static int currentMonth = endMonth;
     private static Proxy proxy = null;
 
     private static JSONArray jsonArray = null;
@@ -37,14 +47,29 @@ public class Utils {
         Utils.proxy = proxy;
     }
 
+    public static int getBeginMonth() {
+        return beginMonth;
+    }
+    public static int getEndMonth() {
+        return endMonth;
+    }
+    public static int getCurrentMonth() {
+        return currentMonth;
+    }
+    public static void setCurrentMonth(int currentMonth) {
+        Utils.currentMonth = currentMonth;
+    }
+
     /***************************************************************************/
 
-    public static JSONObject createObj(String name, double money, String parent){
+    public static JSONObject createObj(String name, String parent){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", Utils.getShortUuid());
         jsonObject.put("name", name);
-        jsonObject.put("money", money);
         jsonObject.put("parent", parent);
+
+        JSONObject monthMoneyObj = new JSONObject();
+        jsonObject.put("monthMoney", monthMoneyObj);
 
         jsonArray.add(jsonObject);
 
