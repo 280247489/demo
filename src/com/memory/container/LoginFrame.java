@@ -17,6 +17,10 @@ public class LoginFrame {
     public static void init(){
         Font font =new Font("微软雅黑", Font.PLAIN, 16);//设置字体
         JFrame jFrame = new JFrame("代理加密系统");
+
+        ImageIcon imageIcon = new ImageIcon("title300.png");
+        jFrame.setIconImage(imageIcon.getImage());
+
         jFrame.setResizable(false);
         jFrame.setSize(400, 300);
         jFrame.setLocationRelativeTo(null);

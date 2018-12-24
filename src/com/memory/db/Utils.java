@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
@@ -16,13 +17,20 @@ import java.util.UUID;
  * @Description:
  */
 public class Utils {
-    public static final String loginname = "";
-    public static final String password = "";
+    //public static final String loginname = "";
+    //public static final String password = "";
+
+    public static final String loginname = "houai@yjw";
+    public static final String password = "147258";
 
     public static SimpleDateFormat sf_yyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat sf_MM = new SimpleDateFormat("MM");
-    //public static final String loginname = "houai@yjw";
-    //public static final String password = "147258";
+
+    public static String xm = "姓名：";
+    public static String dygr = "当月个人：";
+    public static String dytd = "当月团队：";
+    public static String lsgr = "累计个人：";
+    public static String lstd = "累计团队：";
 
     //src/com/memory/db/
     private static final String file_dir = "proxy";
@@ -58,6 +66,9 @@ public class Utils {
     }
     public static void setCurrentMonth(int currentMonth) {
         Utils.currentMonth = currentMonth;
+    }
+    public static String getFile_dir() {
+        return file_dir;
     }
 
     /***************************************************************************/
@@ -178,5 +189,8 @@ public class Utils {
             shortBuffer.append(chars[x % 0x3E]);
         }
         return shortBuffer.toString();
+    }
+    public static Double toDouble(String money){
+        return new BigDecimal(money).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 }

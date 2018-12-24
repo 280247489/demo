@@ -20,6 +20,10 @@ public class ModelFrame {
         if(jFrame==null){
             Font font =new Font("微软雅黑", Font.PLAIN, 16);//设置字体
             jFrame = new JFrame(type.equals("add")?"增 加":"修改");
+
+            ImageIcon imageIcon = new ImageIcon("title300.png");
+            jFrame.setIconImage(imageIcon.getImage());
+
             jFrame.setResizable(false);
             jFrame.setSize(400, 300);
             jFrame.setLocationRelativeTo(null);

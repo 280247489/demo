@@ -14,6 +14,9 @@ public class Proxy {
     private String parentName;
     private Integer count;
 
+    private Double moneyLs;
+    private Double moneySumLs;
+
     @Override
     public String toString() {
         if(count>0){
@@ -77,5 +80,21 @@ public class Proxy {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Double getMoneyLs() {
+        return moneyLs;
+    }
+
+    public void setMoneyLs(Double moneyLs) {
+        this.moneyLs = moneyLs;
+    }
+
+    public Double getMoneySumLs() {
+        return moneySumLs;
+    }
+
+    public void setMoneySumLs(Double moneySumLs) {
+        this.moneySumLs = moneySumLs;
     }
 }
