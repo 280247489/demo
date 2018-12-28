@@ -109,27 +109,29 @@ public class HkFrame {
                 public void propertyChange(PropertyChangeEvent evt) {
                     int changeRow = selectRow;
                     int changeCol = selectCol;
-                    double money = (double) jTable.getValueAt(changeRow, 2);
+                    if(jTable.getRowCount()!=0){
+                        double money = (double) jTable.getValueAt(changeRow, 2);
 
-                    try {
-                        double changeMoney = Double.parseDouble(jTable.getValueAt(changeRow, 3).toString());
-                        changeMoney = Utils.toDouble(""+changeMoney);
-                        jTable.setValueAt(changeMoney, changeRow, 3);
-                        String id = (String) jTable.getValueAt(changeRow, 4);
-                        if(money!=changeMoney){
-                            JSONObject object = new JSONObject();
-                            object.put("id", id);
-                            object.put(""+Utils.getCurrentMonth(), changeMoney);
-                            updList.add(object);
-                            //JSONObject object = Utils.getObj(id);
-                            //object.getJSONObject("monthMoney").put(""+Utils.getCurrentMonth(), changeMoney);
+                        try {
+                            double changeMoney = Double.parseDouble(jTable.getValueAt(changeRow, 3).toString());
+                            changeMoney = Utils.toDouble(""+changeMoney);
+                            jTable.setValueAt(changeMoney, changeRow, 3);
+                            String id = (String) jTable.getValueAt(changeRow, 4);
+                            if(money!=changeMoney){
+                                JSONObject object = new JSONObject();
+                                object.put("id", id);
+                                object.put(""+Utils.getCurrentMonth(), changeMoney);
+                                updList.add(object);
+                                //JSONObject object = Utils.getObj(id);
+                                //object.getJSONObject("monthMoney").put(""+Utils.getCurrentMonth(), changeMoney);
+                            }
+                        } catch (Exception e) {
+                            jTable.setValueAt(money, changeRow, 3);
+                            JOptionPane.showMessageDialog(null,
+                                    "请输入数字",
+                                    "错 误",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
-                    } catch (Exception e) {
-                        jTable.setValueAt(money, changeRow, 3);
-                        JOptionPane.showMessageDialog(null,
-                                "请输入数字",
-                                "错 误",
-                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
